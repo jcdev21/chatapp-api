@@ -8,11 +8,11 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  Header,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import * as argon2 from 'argon2';
 
 @Controller('user')
 export class UserController {
@@ -21,8 +21,6 @@ export class UserController {
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     try {
-      const hashPassword = await argon2.hash(createUserDto.password);
-      createUserDto.password = hashPassword;
       return await this.userService.create(createUserDto);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.FORBIDDEN);
@@ -30,13 +28,34 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Header('Cache-Control', 'none')
+  async findAll() {
+    try {
+      const users = await this.userService.findAll();
+      return {
+        success: true,
+        status: HttpStatus.OK,
+        message: '',
+        data: users,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          status: HttpStatus.BAD_REQUEST,
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')
