@@ -11,17 +11,18 @@ import {
   Header,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Public } from 'src/custom-decorators/public.decorator';
+import { ZodPipe } from 'src/utils/pipes/zod.pipe';
 
-@Public()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(
+    @Body(new ZodPipe(createUserSchema)) createUserDto: CreateUserDto,
+  ) {
     try {
       return await this.userService.create(createUserDto);
     } catch (error) {

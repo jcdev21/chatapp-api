@@ -5,15 +5,22 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto, createUserSchema } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
+import { Public } from 'src/utils/decorators/public.decorator';
+import { ZodPipe } from 'src/utils/pipes/zod.pipe';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() payload: Pick<CreateUserDto, 'email' | 'password'>) {
+  async login(
+    @Body(new ZodPipe(createUserSchema.pick({ email: true, password: true })))
+    payload: Pick<CreateUserDto, 'email' | 'password'>,
+  ) {
+    console.log('Controller', payload);
     try {
       const data = await this.authService.login(
         payload.email,
@@ -38,7 +45,7 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() payload: CreateUserDto) {
+  async register(@Body(new ZodPipe(createUserSchema)) payload: CreateUserDto) {
     try {
       const user = await this.authService.register(payload);
       return {

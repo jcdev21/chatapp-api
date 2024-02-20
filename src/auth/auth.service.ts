@@ -5,6 +5,11 @@ import * as argon2 from 'argon2';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { UserService } from 'src/user/user.service';
 
+type ACCESS_AND_REFRESH_TOKEN = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -18,6 +23,8 @@ export class AuthService {
   ): Promise<
     Pick<User, 'id' | 'name' | 'email' | 'image'> & { accessToken: string }
   > {
+    console.log('Services', email, password);
+
     const user = await this.userService.findByEmail(email);
     if (user && (await argon2.verify(user.password, password))) {
       return {
@@ -43,5 +50,14 @@ export class AuthService {
     dto: CreateUserDto,
   ): Promise<Pick<User, 'id' | 'name' | 'email'>> {
     return await this.userService.create(dto);
+  }
+
+  async createToken(): Promise<ACCESS_AND_REFRESH_TOKEN> {
+    // const refreshId = '';
+
+    return {
+      accessToken: '',
+      refreshToken: '',
+    };
   }
 }
