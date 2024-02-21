@@ -9,8 +9,6 @@ export class VerifyUserMiddleware implements NestMiddleware {
   constructor(private userService: UserService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log('middleware', req.body);
-
     const user = await this.userService.findByEmail(req.body.email);
 
     if (user) {
@@ -26,7 +24,7 @@ export class VerifyUserMiddleware implements NestMiddleware {
     return res.status(HttpStatus.BAD_REQUEST).json({
       status: false,
       statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Invalid email and/or password',
+      message: 'invalid email and/or password',
     });
   }
 }

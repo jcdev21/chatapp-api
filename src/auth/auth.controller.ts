@@ -4,11 +4,14 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Res,
 } from '@nestjs/common';
 import { CreateUserDto, createUserSchema } from 'src/user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { Public } from 'src/utils/decorators/public.decorator';
 import { ZodPipe } from 'src/utils/pipes/zod.pipe';
+import { ACCESS_AND_REFRESH_TOKEN } from 'src/types/token';
+import { Response } from 'express';
 
 @Public()
 @Controller('auth')
@@ -19,18 +22,29 @@ export class AuthController {
   async login(
     @Body(new ZodPipe(createUserSchema.pick({ email: true, password: true })))
     payload: Pick<CreateUserDto, 'email' | 'password'>,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('Controller', payload);
     try {
-      const data = await this.authService.login(
+      const data = await this.authService.verifyUser(
         payload.email,
         payload.password,
       );
+      const { accessToken, refreshToken } = (await this.authService.createToken(
+        data,
+      )) as ACCESS_AND_REFRESH_TOKEN;
+
+      const expCookie = new Date(Date.now() + 60 * 60 * 1000 * 5); // 5 Jam
+      res.cookie('refresh-token', refreshToken, {
+        expires: expCookie,
+        httpOnly: true,
+        sameSite: 'strict',
+      });
+
       return {
         status: true,
         statusCode: HttpStatus.OK,
         message: 'login successfull',
-        data,
+        data: { ...data, accessToken },
       };
     } catch (error) {
       throw new HttpException(
