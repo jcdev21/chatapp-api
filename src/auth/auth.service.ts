@@ -80,7 +80,7 @@ export class AuthService {
         refreshKey,
       },
       process.env.JWT_SECRET_KEY as string,
-      '1m',
+      '10m',
     );
 
     return {
