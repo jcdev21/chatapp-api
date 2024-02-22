@@ -112,7 +112,7 @@ export class AuthController {
 
       return {
         status: true,
-        statusCode: HttpStatus.CREATED,
+        statusCode: HttpStatus.OK,
         message: 'create new access token successfull',
         data: {
           id: user.id,
