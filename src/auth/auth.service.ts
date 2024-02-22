@@ -23,8 +23,6 @@ export class AuthService {
   ): Promise<
     Pick<User, 'id' | 'name' | 'email' | 'image'> & { accessToken: string }
   > {
-    console.log('Services', email, password);
-
     const user = await this.userService.findByEmail(email);
     if (user && (await argon2.verify(user.password, password))) {
       return {
@@ -82,7 +80,7 @@ export class AuthService {
         refreshKey,
       },
       process.env.JWT_SECRET_KEY as string,
-      '20m',
+      '1m',
     );
 
     return {
