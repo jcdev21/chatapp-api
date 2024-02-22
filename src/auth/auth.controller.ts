@@ -88,7 +88,7 @@ export class AuthController {
 
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
-  async refreshToken(
+  async renewToken(
     @Body() { email }: { email: string },
     @Res({ passthrough: true }) res: Response,
   ) {
