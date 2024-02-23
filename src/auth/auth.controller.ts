@@ -103,7 +103,7 @@ export class AuthController {
         },
       )) as ACCESS_AND_REFRESH_TOKEN;
 
-      const expCookie = new Date(Date.now() + 60 * 60 * 1000 * 2); // 2 Jam
+      const expCookie = new Date(Date.now() + 60 * 60 * 1000 * 4); // 4 Jam
       res.cookie('refresh-token', refreshToken, {
         expires: expCookie,
         httpOnly: true,
