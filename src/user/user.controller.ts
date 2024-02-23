@@ -3,16 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
   HttpException,
   HttpStatus,
   Header,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, createUserSchema } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ZodPipe } from 'src/utils/pipes/zod.pipe';
 
 @Controller('user')
@@ -38,7 +35,7 @@ export class UserController {
       return {
         success: true,
         status: HttpStatus.OK,
-        message: '',
+        message: 'success get users',
         data: users,
       };
     } catch (error) {
@@ -57,17 +54,27 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async findOne(@Param('id') id: string) {
+    try {
+      const user = await this.userService.findOne(id);
+      return {
+        success: true,
+        status: HttpStatus.OK,
+        message: 'success get user',
+        data: user,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          status: HttpStatus.BAD_REQUEST,
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: error,
+        },
+      );
+    }
   }
 }
