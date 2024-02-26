@@ -19,6 +19,8 @@ import { UserService } from 'src/user/user.service';
 @Public()
 @Controller('auth')
 export class AuthController {
+  private readonly expCookie = new Date(Date.now() + 60 * 60 * 1000 * 2); // 2 Jam
+
   constructor(
     private readonly authService: AuthService,
     private userService: UserService,
@@ -39,9 +41,8 @@ export class AuthController {
         data,
       )) as ACCESS_AND_REFRESH_TOKEN;
 
-      const expCookie = new Date(Date.now() + 60 * 60 * 1000 * 2); // 2 Jam
       res.cookie('refresh-token', refreshToken, {
-        expires: expCookie,
+        expires: this.expCookie,
         httpOnly: true,
         sameSite: 'strict',
       });
@@ -103,9 +104,8 @@ export class AuthController {
         },
       )) as ACCESS_AND_REFRESH_TOKEN;
 
-      const expCookie = new Date(Date.now() + 60 * 60 * 1000 * 4); // 4 Jam
       res.cookie('refresh-token', refreshToken, {
-        expires: expCookie,
+        expires: this.expCookie,
         httpOnly: true,
         sameSite: 'strict',
       });
