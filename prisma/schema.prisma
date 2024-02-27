@@ -22,6 +22,8 @@ model User {
   image         String?
   active        Boolean   @default(false)
 
+  messages      Message[]
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -29,11 +31,28 @@ model User {
 }
 
 model Chat {
-  id      String    @id @default(auto()) @map("_id") @db.ObjectId
-  members String[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  members     String[]
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  messages    Message[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("chats")
+}
+
+model Message {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  chatId      String @db.ObjectId
+  senderId    String @db.ObjectId
+  message     String
+
+  chat        Chat @relation(fields: [chatId], references: [id])
+  sender      User @relation(fields: [senderId], references: [id])
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("messages")
 }
