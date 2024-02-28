@@ -13,11 +13,8 @@ export class ChatService {
     });
   }
 
-  async findExisted(members: string[]): Promise<Pick<Chat, 'id'> | null> {
+  async findOneByMember(members: string[]): Promise<Chat | null> {
     return this.prisma.chat.findFirst({
-      select: {
-        id: true,
-      },
       where: {
         members: {
           hasEvery: members,

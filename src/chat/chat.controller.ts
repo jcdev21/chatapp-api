@@ -18,7 +18,7 @@ export class ChatController {
   @Post()
   async create(@Body(new ZodPipe(createChatSchema)) payload: CreateChatDto) {
     try {
-      const chatExist = await this.chatService.findExisted(payload.members);
+      const chatExist = await this.chatService.findOneByMember(payload.members);
       if (chatExist) {
         return {
           status: true,
