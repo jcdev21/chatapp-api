@@ -54,4 +54,61 @@ export class UserService {
   async findByEmail(email: string) {
     return await this.prisma.user.findUnique({ where: { email } });
   }
+
+  async findAllNotChatMember(
+    userId: string,
+    idMembers: string[],
+  ): Promise<Pick<User, 'id' | 'email' | 'name' | 'image'>[]> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+      },
+      where: {
+        AND: [
+          {
+            id: {
+              notIn: idMembers,
+            },
+          },
+          {
+            id: {
+              not: userId,
+            },
+          },
+        ],
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async findAllChatMember(
+    userId: string,
+    idMembers: string[],
+  ): Promise<Pick<User, 'id' | 'email' | 'name' | 'image'>[]> {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+      },
+      where: {
+        AND: [
+          {
+            id: {
+              in: idMembers,
+            },
+          },
+          {
+            id: {
+              not: userId,
+            },
+          },
+        ],
+      },
+    });
+  }
 }

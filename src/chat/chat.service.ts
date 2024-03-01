@@ -23,13 +23,28 @@ export class ChatService {
     });
   }
 
-  async findAllById(id: string): Promise<Chat[]> {
+  async findAllByUserId(id: string): Promise<Chat[]> {
     return this.prisma.chat.findMany({
       where: {
         members: {
           has: id,
         },
       },
+      orderBy: { updatedAt: 'desc' },
+    });
+  }
+
+  async getIdUserInclude(userId: string, chats: Chat[]): Promise<string[]> {
+    return chats.map((chat) => {
+      const idxSameUserId = chat.members.indexOf(userId);
+      chat.members.splice(idxSameUserId, 1)[0];
+      return chat.members[0];
+
+      // jika tidak ingin terjadi mutate di chats dan chats di controller
+      // if (idxSameUserId === 1) {
+      //   return chat.members[0];
+      // }
+      // return chat.members[1];
     });
   }
 }
