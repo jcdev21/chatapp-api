@@ -21,9 +21,17 @@ export class UserController {
     @Body(new ZodPipe(createUserSchema)) createUserDto: CreateUserDto,
   ) {
     try {
+      throw new Error('Ada Error');
       return await this.userService.create(createUserDto);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        {
+          status: false,
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -41,8 +49,8 @@ export class UserController {
     } catch (error) {
       throw new HttpException(
         {
-          success: false,
-          status: HttpStatus.BAD_REQUEST,
+          status: false,
+          statusCode: HttpStatus.BAD_REQUEST,
           message: error.message,
         },
         HttpStatus.BAD_REQUEST,
@@ -66,8 +74,8 @@ export class UserController {
     } catch (error) {
       throw new HttpException(
         {
-          success: false,
-          status: HttpStatus.BAD_REQUEST,
+          status: false,
+          statusCode: HttpStatus.BAD_REQUEST,
           message: error.message,
         },
         HttpStatus.BAD_REQUEST,
