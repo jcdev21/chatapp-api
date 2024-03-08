@@ -95,6 +95,7 @@ export class ChatController {
 
   @Get(':userId/exclude')
   async getExcludeMembers(@Param('userId') userId: string) {
+    await new Promise((r) => setTimeout(r, 5000));
     try {
       const chats = await this.chatService.findAllByUserId(userId);
       const idMembers = await this.chatService.getIdUserInclude(userId, chats);
