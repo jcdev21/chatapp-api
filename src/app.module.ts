@@ -7,6 +7,8 @@ import { GlobalModule } from './global.module';
 import { ChatModule } from './chat/chat.module';
 import { MessageModule } from './message/message.module';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { ZodFilter } from './utils/filters/zod.filter';
 
 @Module({
   imports: [
@@ -20,6 +22,12 @@ import { ConfigModule } from '@nestjs/config';
     MessageModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: ZodFilter,
+    },
+  ],
 })
 export class AppModule {}

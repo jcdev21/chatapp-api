@@ -1,9 +1,4 @@
-import {
-  ArgumentMetadata,
-  BadRequestException,
-  Injectable,
-  PipeTransform,
-} from '@nestjs/common';
+import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import { ZodSchema } from 'zod';
 
 @Injectable()
@@ -11,8 +6,11 @@ export class ZodPipe implements PipeTransform {
   constructor(private readonly schema: ZodSchema) {}
 
   transform(value: unknown, metadata: ArgumentMetadata) {
-    const parsedValue = this.schema.parse(value);
-    return parsedValue;
+    // jadi hanya request body yang di validasi
+    if (metadata.type === 'body') {
+      return this.schema.parse(value);
+    }
+    return value;
 
     // Berdasarkan dokumentasi nest
     // try {
