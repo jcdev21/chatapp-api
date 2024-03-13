@@ -9,12 +9,14 @@ import * as crypto from 'crypto';
 import { RefreshDataType } from 'src/types/refresh';
 import { PayloadJWTAccessTokenType } from 'src/types/jwt';
 import { ACCESS_AND_REFRESH_TOKEN } from 'src/types/token';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async login(
@@ -35,7 +37,7 @@ export class AuthService {
             id: user.id,
           },
           {
-            secret: process.env.JWT_SECRET_KEY,
+            secret: this.configService.get('JWT_SECRET_KEY'),
           },
         ),
       };
@@ -71,7 +73,7 @@ export class AuthService {
     id,
     email,
   }: Pick<User, 'id' | 'email'>): Promise<ACCESS_AND_REFRESH_TOKEN> {
-    const refreshId = id + process.env.JWT_SECRET_KEY;
+    const refreshId = id + this.configService.get('JWT_SECRET_KEY');
     const { refreshToken, refreshKey } = this.generateRefreshToken(refreshId);
     const accessToken = await this.generateAccessToken(
       {
@@ -79,7 +81,7 @@ export class AuthService {
         email,
         refreshKey,
       },
-      process.env.JWT_SECRET_KEY as string,
+      this.configService.get('JWT_SECRET_KEY') as string,
       '10m',
     );
 

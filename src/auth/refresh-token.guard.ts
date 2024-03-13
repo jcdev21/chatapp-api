@@ -9,10 +9,14 @@ import { Observable } from 'rxjs';
 import { JwtPayloadType } from 'src/types/jwt';
 import { extractTokenFromHeader } from 'src/utils/authentication';
 import * as crypto from 'crypto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
 
   canActivate(
     context: ExecutionContext,
@@ -30,7 +34,9 @@ export class RefreshTokenGuard implements CanActivate {
         );
         const hash = crypto
           .createHmac('sha512', salt)
-          .update(accessTokenDecoded.id + process.env.JWT_SECRET_KEY)
+          .update(
+            accessTokenDecoded.id + this.configService.get('JWT_SECRET_KEY'),
+          )
           .digest('base64');
 
         if (hash === request.cookies['refresh-token']) {
