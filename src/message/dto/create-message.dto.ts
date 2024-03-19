@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const createMessageSchema = z.object({
-  chatId: z.string(),
-  senderId: z.string(),
+  chatId: z.string().min(1),
+  senderId: z.string().min(1),
   message: z.string().min(1),
 });
 
