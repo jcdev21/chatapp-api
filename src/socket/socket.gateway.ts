@@ -25,28 +25,38 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.info(`socket disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('chat')
-  async handleMessage(
+  @SubscribeMessage('joinChat')
+  handleJoinChat(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() chatId: string,
+  ): void {
+    console.log('JOIN CHAT', chatId);
+    client.join(chatId);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleSendMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: CreateMessageDto,
-  ): Promise<string> {
-    console.log(client.handshake.headers.cookie);
-    console.log('trigger from client', payload);
+  ): Promise<void> {
+    // console.log(client.handshake.headers.cookie);
+    // console.log('trigger from client', payload);
     const message = await this.messageService.create({
       chatId: payload.chatId,
       senderId: payload.senderId,
       message: payload.message,
     });
-    console.log(message);
 
     // to all
-    this.server.sockets.emit('chat', message);
+    // this.server.sockets.emit('receiveMessage', message);
 
     // to all connected clients except the sender
-    // this.server.emit('chat', message);
+    // this.server.emit('receiveMessage', message);
+
+    // to specific client
+    this.server.to(payload.chatId).emit('receiveMessage', message);
 
     // only to sender
-    // client.emit('chat', message);
-    return 'Hello world!';
+    // client.emit('receiveMessage', message);
   }
 }
