@@ -29,6 +29,9 @@ export class ChatService {
         members: {
           has: id,
         },
+        messages: {
+          some: {},
+        },
       },
       orderBy: { updatedAt: 'desc' },
     });
